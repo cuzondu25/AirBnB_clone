@@ -1,33 +1,33 @@
 #!/usr/bin/python3
-"""my storage file"""
+"""Defines the FileStorage class."""
 import json
-from models.amenity import Amenity
-from models.review import Review
+from models.base_model import BaseModel
+from models.user import User
 from models.state import State
 from models.city import City
 from models.place import Place
-from models.user import User
-from models.base_model import BaseModel
+from models.amenity import Amenity
+from models.review import Review
 
 
 class FileStorage:
-    """my file storage class
-    Attributes
-        file_path:  path to storage file
-        objects:    objects to be saved
-    """
+    """Represent an abstracted storage engine.
 
+    Attributes:
+        __file_path (str): The name of the file to save objects to.
+        __objects (dict): A dictionary of instantiated objects.
+    """
     __file_path = "file.json"
     __objects = {}
 
     def all(self):
-        """returns object dictionary to be saved"""
+        """Return the dictionary __objects."""
         return FileStorage.__objects
 
     def new(self, obj):
-        """Adds new object to the dictionary of objects"""
-        key = "{}.{}".format(obj.__class__.__name__, obj.id)
-        FileStorage.__objects[key] = obj
+        """Set in __objects obj with key <obj_class_name>.id"""
+        ocname = obj.__class__.__name__
+        FileStorage.__objects["{}.{}".format(ocname, obj.id)] = obj
 
     def save(self):
         """Serialize __objects to the JSON file __file_path."""

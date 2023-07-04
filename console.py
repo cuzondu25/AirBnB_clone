@@ -1,21 +1,16 @@
 #!/usr/bin/python3
-"""my console command line"""
+"""Defines the HBnB console."""
 import cmd
-import readline
+import re
+from shlex import split
 from models import storage
 from models.base_model import BaseModel
 from models.user import User
-from models.review import Review
 from models.state import State
+from models.city import City
 from models.place import Place
 from models.amenity import Amenity
-from models.city import City
-from shlex import split
-"""A program that contains the entry point of the command interpreter
-
-    class:
-        HBNBCommand: inherits from the Cmd class
-"""
+from models.review import Review
 
 
 def parse(arg):
@@ -37,11 +32,15 @@ def parse(arg):
 
 
 class HBNBCommand(cmd.Cmd):
-    """CLI class"""
+    """Defines the HolbertonBnB command interpreter.
 
-    prompt = '(hbnb) '
+    Attributes:
+        prompt (str): The command prompt.
+    """
+
+    prompt = "(hbnb) "
     __classes = {
-       "BaseModel",
+        "BaseModel",
         "User",
         "State",
         "City",
@@ -51,17 +50,37 @@ class HBNBCommand(cmd.Cmd):
     }
 
     def emptyline(self):
-        """override the parent emptyline method from executing the
-        previous command by excuting nothing
-        """
+        """Do nothing upon receiving an empty line."""
         pass
 
-    def do_quit(self, args):
-        """return true to exit the shell"""
+    def default(self, arg):
+        """Default behavior for cmd module when input is invalid"""
+        argdict = {
+            "all": self.do_all,
+            "show": self.do_show,
+            "destroy": self.do_destroy,
+            "count": self.do_count,
+            "update": self.do_update
+        }
+        match = re.search(r"\.", arg)
+        if match is not None:
+            argl = [arg[:match.span()[0]], arg[match.span()[1]:]]
+            match = re.search(r"\((.*?)\)", argl[1])
+            if match is not None:
+                command = [argl[1][:match.span()[0]], match.group()[1:-1]]
+                if command[0] in argdict.keys():
+                    call = "{} {}".format(argl[0], command[1])
+                    return argdict[command[0]](call)
+        print("*** Unknown syntax: {}".format(arg))
+        return False
+
+    def do_quit(self, arg):
+        """Quit command to exit the program."""
         return True
 
-    def do_EOF(self, args):
-        """exit the program"""
+    def do_EOF(self, arg):
+        """EOF signal to exit the program."""
+        print("")
         return True
 
     def do_create(self, arg):
@@ -137,27 +156,6 @@ class HBNBCommand(cmd.Cmd):
                 count += 1
         print(count)
 
-    def default(self, arg):
-        """Default behavior for CLI when input is invalid"""
-        argdict = {
-            "all": self.do_all,
-            "show": self.do_show,
-            "destroy": self.do_destroy,
-            "count": self.do_count,
-            "update": self.do_update
-        }
-        match = re.search(r"\.", arg)
-        if match is not None:
-            argl = [arg[:match.span()[0]], arg[match.span()[1]:]]
-            match = re.search(r"\((.*?)\)", argl[1])
-            if match is not None:
-                command = [argl[1][:match.span()[0]], match.group()[1:-1]]
-                if command[0] in argdict.keys():
-                    call = "{} {}".format(argl[0], command[1])
-                    return argdict[command[0]](call)
-        print("*** Unknown syntax: {}".format(arg))
-        return False
-
     def do_update(self, arg):
         """Usage: update <class> <id> <attribute_name> <attribute_value> or
        <class>.update(<id>, <attribute_name>, <attribute_value>) or
@@ -208,5 +206,5 @@ class HBNBCommand(cmd.Cmd):
         storage.save()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     HBNBCommand().cmdloop()
