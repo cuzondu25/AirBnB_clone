@@ -1,13 +1,16 @@
 #!/usr/bin/python3
+"""python command line program for my models"""
 import cmd
-import readline
-'''A program that contains the entry point of the command interpreter
+"""A program that contains the entry point of the command interpreter
 
     class:
         HBNBCommand: inherits from the Cmd class
-'''
+"""
+
+
 class HBNBCommand(cmd.Cmd):
     prompt = '(hbnb) '
+
     def emptyline(self):
         """override the parent emptyline method from executing the
         previous command by excuting nothing
