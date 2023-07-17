@@ -7,6 +7,7 @@ Unittest classes:
     TestBaseModel_to_dict
 """
 
+from time import sleep
 import os
 import models
 import unittest
@@ -39,20 +40,54 @@ class TestBaseModel_to_dict(unittest.TestCase):
     """Unittests for testing to_dict method of the BaseModel class."""
 
     def test_to_dict_type(self):
-        bm = BaseModel()
-        self.assertTrue(dict, type(bm.to_dict()))
+        base = BaseModel()
+        self.assertTrue(dict, type(base.to_dict()))
 
     def test_to_dict_contains_correct_keys(self):
-        bm = BaseModel()
-        self.assertIn("id", bm.to_dict())
-        self.assertIn("created_at", bm.to_dict())
-        self.assertIn("updated_at", bm.to_dict())
-        self.assertIn("__class__", bm.to_dict())
+        base = BaseModel()
+        self.assertIn("id", base.to_dict())
+        self.assertIn("created_at", base.to_dict())
+        self.assertIn("updated_at", base.to_dict())
+        self.assertIn("__class__", base.to_dict())
 
     def test_to_dict_contains_added_attributes(self):
-        bm = BaseModel()
-        bm.name = "Holberton"
-        bm.my_number = 98
-        self.assertIn("name", bm.to_dict())
-        self.assertIn("my_number", bm.to_dict())
+        base = BaseModel()
+        base.name = "Holberton"
+        base.my_number = 98
+        self.assertIn("name", base.to_dict())
+        self.assertIn("my_number", base.to_dict())
 
+    def test_str_(self):
+        base = BaseModel()
+        base.id = "123456"
+        basestr = base.__str__()
+        self.assertIn("[BaseModel] (123456)", basestr)
+        self.assertIn("'id': '123456'", basestr)
+
+class TestBaseModel_save(unittest.TestCase):
+    """Unittests for testing save method of the BaseModel class."""
+
+    @classmethod
+    def setUp(self):
+        try:
+            os.rename("file.json", "tmp")
+        except IOError:
+            pass
+
+    @classmethod
+    def tearDown(self):
+        try:
+            os.remove("file.json")
+        except IOError:
+            pass
+        try:
+            os.rename("tmp", "file.json")
+        except IOError:
+            pass
+
+    def test_save(self):
+        base = BaseModel()
+        sleep(0.05)
+        first_updated_at = base.updated_at
+        base.save()
+        self.assertLess(first_updated_at, base.updated_at)
