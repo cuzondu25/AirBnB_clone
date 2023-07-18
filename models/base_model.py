@@ -1,12 +1,12 @@
 #!/usr/bin/python3
-"""Defines the BaseModel class."""
+"""Defines BaseModel class."""
 import models
 from uuid import uuid4
 from datetime import datetime
 
 
 class BaseModel:
-    """Represents the BaseModel of the HBnB project."""
+    """Represents BaseModel of HBnB project."""
 
     def __init__(self, *args, **kwargs):
         """Initialize a new BaseModel.
@@ -28,24 +28,28 @@ class BaseModel:
         else:
             models.storage.new(self)
 
+    def __str__(self):
+        """Return print/str representation of BaseModel instance"""
+        clsname = self.__class__.__name__
+        return "[{}] ({}) {}".format(clsname, self.id, self.__dict__)
+
     def save(self):
-        """Update updated_at with the current datetime."""
+        """Update updated_at with current datetime."""
         self.updated_at = datetime.today()
         models.storage.save()
 
     def to_dict(self):
-        """Return the dictionary of the BaseModel instance.
-
-        Includes the key/value pair __class__ representing
-        the class name of the object.
-        """
-        rdict = self.__dict__.copy()
-        rdict["created_at"] = self.created_at.isoformat()
-        rdict["updated_at"] = self.updated_at.isoformat()
-        rdict["__class__"] = self.__class__.__name__
-        return rdict
+        """returns the dictionary representation of the object"""
+        my_dict = {"__class__": self.__class__.__name__}
+        my_dict.update(self.__dict__)
+        for key, value in my_dict.items():
+            if key == "created_at":
+                my_dict[key] = self.created_at.isoformat()
+            if key == "updated_at":
+                my_dict[key] = self.updated_at.isoformat()
+        return my_dict
 
     def __str__(self):
-        """Return the print/str representation of the BaseModel instance."""
-        clname = self.__class__.__name__
-        return "[{}] ({}) {}".format(clname, self.id, self.__dict__)
+        """Return print/str representation of BaseModel instance."""
+        clsname = self.__class__.__name__
+        return "[{}] ({}) {}".format(clsname, self.id, self.__dict__)
